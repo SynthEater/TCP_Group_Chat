@@ -2,64 +2,89 @@
 const net = require('node:net');
 
 // Use nodejs 'Prompt-Sync' module
-const prompt = require('prompt-sync')({ sigint: true});
+const prompt = require('prompt-sync')({ sigint: true });
+
+const clients = [];
 
 // Creation of the server
 const server = net.createServer(socket => {
 
-    let dataNb = 0;
-    let username;
-    
-    //Show that a client has connected(+ his ip)
-    console.log('CLIENT CONNECTED (' + socket.remoteAddress + ')');
+    clients.push(socket);
 
-    //Send hello back to client on socket
-    socket.write('\n-Welcome to TCP Server!\n\n');
-
-
-    //see gpt code for 'connection event'
-
-
-    socket.write('-The first message you send will be your username\nIf you want to display your ip instead, type "ip"\n\n');
-
-    //Print data received from client
+    // Listen for the 'data' event when data is received from the client
     socket.on('data', data => {
-        if(dataNb == 0 && data.toString() !== 'ip'){
-            username = data.toString().trim();
-            dataNb++;
-        } else {    
-            if(data.toString().trim() === 'ip'){
-                console.log(' client(' + socket.remoteAddress + '): ' + data.toString());
-                dataNb++;
-            } else {
-                console.log('from: ' + username + ': ' + data.toString());
-                dataNb++;
+
+        if(socket.dataNb > 0){
+
+            console.log('(' + socket.username + '): ' + data.toString().trim());
+
+            for(let i = 0; i < clients.length ; i++){
+
+                clients[i].write('          (' + socket.username + '): ' + data.toString().trim());
+                clients[i].write('\n')
             }
         }
-    })
 
-    //Show that a client has disconnected(+ his ip)
+        if (socket.dataNb === 0 && data.toString().trim() !== 'ip') {
+            socket.username = data.toString().trim();
+            socket.dataNb++;
+
+        } else if(socket.dataNb === 0 && data.toString().trim() === 'ip') { 
+            socket.username = socket.clientIp;
+            socket.dataNb++;
+                  
+        }
+    });
+
+    // Show that a client has disconnected (+ their ip)
     socket.on('end', () => {
-        console.log('CLIENT DISCONNECTED ('+ socket.remoteAddress + ')');
-    })
+        console.log('CLIENT DISCONNECTED (' + socket.username + ')');
 
-    //On fail, send error message to client and print error in server's terminal
-    socket.on('error', () => {
-        console.log('AN ERROR MADE THE SERVER SHUT DOWN!');
-        socket.write('AN ERROR MADE THE SERVER SHUT DOWN!');
-    })
-})
+        for(let j = 0; j < clients.length ; j++){
+                
+            clients[j].write('CLIENT DISCONNECTED (' + socket.username + ')');
+            clients[j].write('\n')
+        }
+
+        //remove disconnected clients from clients array
+        const index = clients.indexOf(socket);
+        if (index !== -1) {
+            clients.splice(index, 1);
+        }
+    });
+
+    // On fail, send error message to client and print error in server's terminal
+    socket.on('error', (err) => {
+        if(err.code !== 'EPIPE'){
+            console.error('ERROR', err);
+        }
+        socket.write('ERROR');
+    });
+});
+
+// Listen for the 'connection' event when a new connection is established
+server.on('connection', socket => {
+    // Store the client's IP address within the socket object
+    socket.clientIp = socket.remoteAddress;
+    // Initialize dataNb for the current client
+    socket.dataNb = 0;
+    console.log('CLIENT CONNECTED (' + socket.clientIp + ')');
+
+    for(let k = 0 ; k < clients.length ; k++){
+        clients[k].write('CLIENT CONNECTED (' + socket.clientIp + ')');
+        clients[k].write('\n');
+    }
 
 
-//accept all ip addresses on port 1647
+    // Send initial messages to the client
+    socket.write('\n-Welcome to TCP Server!\n\n');
+    socket.write('-The first message you send will be your username\nIf you want to display your ip instead, type "ip"\n\n');
+});
+
+// Accept all IP addresses on port 1647
 const HOST = '0.0.0.0';
 const PORT = 1647;
 server.listen(PORT, HOST, () => {
     console.log(`${HOST} : ${PORT}`);
-})
+});
 
-// Function to send a message to a specific client
-//Use array index of the client you want to talk to in 'clients' array (use j1-4 variables ex: sendToClient(j1, 'alloTest'))
-function sendToClient(clientSocket, message) {
-    clientSocket.write(message);
-}
