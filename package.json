@@ -1,5 +1,13 @@
 {
   "dependencies": {
-    "prompt-sync": "^4.2.0"
+    "fa": "^1.0.1",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7",
+    "prompt-sync": "^4.2.0",
+    "ws": "^8.18.0"
+  },
+  "scripts": {
+    "gserver": "node GroupServer.js"
   }
 }

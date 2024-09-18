@@ -13,7 +13,7 @@ const server = net.createServer(socket => {
     console.log('CLIENT CONNECTED (' + socket.remoteAddress + ')');
 
     //print socket object of client (debug)
-    console.log(socket);
+    //console.log(socket);
 
     //Send hello back to client on socket
     socket.write('\nWelcome to TCP Server!\n');

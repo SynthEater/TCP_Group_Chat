@@ -1,6 +1,8 @@
 // Use nodejs 'Net' module
 const net = require('node:net');
 
+
+
 // Use nodejs 'Prompt-Sync' module
 const prompt = require('prompt-sync')({ sigint: true });
 
@@ -66,6 +68,7 @@ const server = net.createServer(socket => {
 server.on('connection', socket => {
     // Store the client's IP address within the socket object
     socket.clientIp = socket.remoteAddress;
+    
     // Initialize dataNb for the current client
     socket.dataNb = 0;
     console.log('CLIENT CONNECTED (' + socket.clientIp + ')');
@@ -87,4 +90,3 @@ const PORT = 1647;
 server.listen(PORT, HOST, () => {
     console.log(`${HOST} : ${PORT}`);
 });
-
