@@ -18,9 +18,6 @@ const server = net.createServer(socket => {
     //Send hello back to client on socket
     socket.write('\nWelcome to TCP Server!\n');
 
-    //Create a 'prompt' for client
-    socket.write('$:');
-
     //Print data received from client
     socket.on('data', data => {
         console.log(' client(' + socket.remoteAddress + '): ' + data.toString());
