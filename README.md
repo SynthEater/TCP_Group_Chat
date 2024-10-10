@@ -5,4 +5,4 @@
     telnet [ip of server] [port]
 ### Netcat:
     netcat [ip of server] [port]
-### The use of clients like putty is not recommended since it breaks the intended formatting for the group chat
+## The use of clients like putty is not recommended since it breaks the intended formatting for the group chat
