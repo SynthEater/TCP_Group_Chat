@@ -1,11 +1,6 @@
 // Use nodejs 'Net' module
 const net = require('node:net');
 
-
-
-// Use nodejs 'Prompt-Sync' module
-const prompt = require('prompt-sync')({ sigint: true });
-
 const clients = [];
 
 // Creation of the server
@@ -26,11 +21,11 @@ const server = net.createServer(socket => {
                 clients[i].write('\n')
             }
         }
-
+        //Check if client wants a username or diaplay his IP
         if (socket.dataNb === 0 && data.toString().trim() !== 'ip') {
             socket.username = data.toString().trim();
             socket.dataNb++;
-
+        // Display IP
         } else if(socket.dataNb === 0 && data.toString().trim() === 'ip') { 
             socket.username = socket.clientIp;
             socket.dataNb++;
